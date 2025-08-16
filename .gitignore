@@ -1,0 +1,31 @@
+
+# Ignore system files & Windows folders
+.DS_Store
+Thumbs.db
+NTUSER.DAT*
+*.regtrans-ms
+*.blf
+*.ini
+
+# Ignore common Windows directories
+AppData/
+Contacts/
+Desktop/
+Documents/
+Downloads/
+Favorites/
+Links/
+Music/
+OneDrive/
+Pictures/
+Saved Games/
+Searches/
+Videos/
+
+# Ignore VSCode and other editor settings
+.vscode/
+
+
+
+
+
