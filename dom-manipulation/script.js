@@ -69,10 +69,11 @@ function addQuote() {
   if (text && category) {
     quotes.push({ text, category });
     localStorage.setItem("quotes", JSON.stringify(quotes));
-    populateCategories();
+    postQuoteToServer(newQuote);
     alert("Quote added successfully!");
     document.getElementById("newQuoteText").value = "";
     document.getElementById("newQuoteCategory").value = "";
+    populateCategories();
   } else {
     alert("Please enter both text and category.");
   }
@@ -152,10 +153,119 @@ window.onload = () => {
     document.getElementById("quoteDisplay").innerText =
       `"${quote.text}" — ${quote.category}`;
   }
-
   
   populateCategories();
+  fetchQuotesFromServer();
+  startDataSync();
 };
+
+const SERVER_URL = "https://jsonplaceholder.typicode.com/posts";
+
+
+async function fetchQuotesFromServer() {
+  try {
+    const response = await fetch(SERVER_URL);
+    const data = await response.json();
+
+    const serverQuotes = data.slice(0, 5).map(item => ({
+      text: item.title,
+      category: "Server"
+    }));
+
+    mergeQuotes(serverQuotes);
+    console.log("Quotes synced from server:", serverQuotes);
+  } catch (error) {
+    console.error("Error fetching from server:", error);
+  }
+}
+
+
+async function postQuoteToServer(quote) {
+  try {
+    const response = await fetch(SERVER_URL, {
+      method: "POST",
+      body: JSON.stringify(quote),
+      headers: {
+        "Content-type": "application/json; charset=UTF-8"
+      }
+    });
+
+    const data = await response.json();
+    console.log("Quote posted to server:", data);
+  } catch (error) {
+    console.error("Error posting to server:", error);
+  }
+}
+
+
+function mergeQuotes(serverQuotes) {
+  let localQuotes = JSON.parse(localStorage.getItem("quotes")) || [];
+  let merged = [...localQuotes];
+
+  serverQuotes.forEach(sq => {
+    if (!localQuotes.some(lq => lq.text === sq.text)) {
+      merged.push(sq);
+    }
+  });
+
+  localStorage.setItem("quotes", JSON.stringify(merged));
+  quotes = merged;
+  populateCategories();
+}
+function startDataSync() {
+  setInterval(async () => {
+    console.log(" Syncing with server...");
+    await syncWithServer();
+  }, 30000); // 30 seconds
+}
+async function syncWithServer() {
+  try {
+    const response = await fetch(SERVER_URL);
+    const serverData = await response.json();
+ const serverQuotes = serverData.slice(0, 5).map(item => ({
+      text: item.title,
+      category: "Server"
+    }));
+    const localQuotes = JSON.parse(localStorage.getItem("quotes")) || [];
+     const isConflict = JSON.stringify(localQuotes) !== JSON.stringify(serverQuotes);
+
+    if (isConflict) {
+      
+      document.getElementById("conflictNotification").style.display = "block";
+
+
+
+    localStorage.setItem("quotes", JSON.stringify(serverQuotes));
+    quotes = serverQuotes;
+
+    populateCategories();
+    console.log("Conflict detected. Server data overwrote local.");
+    } else {
+      console.log(" No conflicts. Data is in sync.");
+    }
+  } catch (error) {
+    console.error(" Sync error:", error);
+  }
+}
+function resolveConflictsManually() {
+  const choice = confirm("Conflict detected! Click OK to keep LOCAL data, or Cancel to keep SERVER data.");
+
+  if (choice) {
+    const localQuotes = JSON.parse(localStorage.getItem("quotes")) || [];
+    quotes = localQuotes;
+    console.log(" User kept LOCAL quotes.");
+  } else {
+  
+    fetchQuotesFromServer(); 
+    console.log("User kept SERVER quotes.");
+  }
+
+  populateCategories();
+  document.getElementById("conflictNotification").style.display = "none"; // hide notice
+}
+
+
+
 
 
 
