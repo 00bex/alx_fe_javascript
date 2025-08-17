@@ -69,11 +69,11 @@ function addQuote() {
   if (text && category) {
     quotes.push({ text, category });
     localStorage.setItem("quotes", JSON.stringify(quotes));
-    postQuoteToServer(newQuote);
     alert("Quote added successfully!");
     document.getElementById("newQuoteText").value = "";
     document.getElementById("newQuoteCategory").value = "";
     populateCategories();
+    postQuoteToServer(newQuote);
   } else {
     alert("Please enter both text and category.");
   }
@@ -178,13 +178,11 @@ async function fetchQuotesFromServer() {
     console.error("Error fetching from server:", error);
   }
 }
-
-
-async function postQuoteToServer(quote) {
+async function postQuoteToServer(Quote) {
   try {
     const response = await fetch(SERVER_URL, {
       method: "POST",
-      body: JSON.stringify(quote),
+      body: JSON.stringify(Quote),
       headers: {
         "Content-type": "application/json; charset=UTF-8"
       }
