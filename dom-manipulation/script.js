@@ -178,11 +178,11 @@ async function fetchQuotesFromServer() {
     console.error("Error fetching from server:", error);
   }
 }
-async function postQuoteToServer(Quote) {
+async function postQuoteToServer(quote) {
   try {
     const response = await fetch(SERVER_URL, {
       method: "POST",
-      body: JSON.stringify(Quote),
+      body: JSON.stringify(quote),
       headers: {
         "Content-type": "application/json; charset=UTF-8"
       }
