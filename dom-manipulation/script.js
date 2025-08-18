@@ -67,13 +67,14 @@ function addQuote() {
   const category = document.getElementById("newQuoteCategory").value.trim();
 
   if (text && category) {
-    quotes.push({ text, category });
+    const quoteObj = {text, category};
+    quotes.push (quoteObj );
     localStorage.setItem("quotes", JSON.stringify(quotes));
     alert("Quote added successfully!");
     document.getElementById("newQuoteText").value = "";
     document.getElementById("newQuoteCategory").value = "";
     populateCategories();
-    postQuoteToServer(newQuote);
+    postQuoteToServer(quoteObj);
   } else {
     alert("Please enter both text and category.");
   }
